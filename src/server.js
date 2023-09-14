@@ -14,7 +14,7 @@ const hostname = 'localhost' || process.env.APP_HOST;
 const port = 8000 || process.env.APP_PORT;
 
 app.use(cookieParser());
-app.use(cors({ options }));
+app.use(cors(options));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(apiResponse);

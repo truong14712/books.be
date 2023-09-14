@@ -6,5 +6,6 @@ import uploadCloud from '~/middlewares/cloudinary.config';
 
 const router = express.Router();
 router.post('/register', uploadCloud.single('image'), AuthValidation.register, AuthController.register);
-
+router.post('/login', AuthController.login, AuthController.login);
+router.post('/refresh-token', asyncHandler(AuthController.refreshToken));
 export default router;
