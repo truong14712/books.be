@@ -8,4 +8,6 @@ const router = express.Router();
 router.post('/register', uploadCloud.single('image'), AuthValidation.register, AuthController.register);
 router.post('/login', AuthController.login, AuthController.login);
 router.post('/refresh-token', asyncHandler(AuthController.refreshToken));
+router.post('/logout', AuthController.logout);
+router.post('/activation', AuthController.activation);
 export default router;

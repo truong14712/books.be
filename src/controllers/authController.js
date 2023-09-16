@@ -3,19 +3,51 @@ import ErrorHandler from '~/utils/ErrorHandler';
 import JwtHelpers from '~/utils/jwtToken';
 import jwt from 'jsonwebtoken';
 import responseStatus from '~/constants/responseStatus';
+import createActivationToken from '~/utils/createActivationToken';
+import sendMail from '~/utils/sendMail';
+
 const authController = {
   async register(req, res, next) {
     try {
-      const data = req.body;
       const fileData = req.file;
-      const newUser = await authService.register(data, fileData);
-      return res.apiResponse(newUser);
+      const data = req.body;
+      const user = {
+        fileData,
+        data,
+      };
+      const activationToken = createActivationToken(user);
+      const activationUrl = `http://localhost:4200/activation/${activationToken}`;
+      await sendMail({
+        email: user.data.email,
+        subject: 'Activate your account',
+        message: `Hello ${user.data.firstName}${user.data.lastName}, please click on the link to activate your account: ${activationUrl}`,
+      });
+      return res.status(201).json({
+        success: true,
+        message: `please check your email:- ${user.data.email} to activate your account!`,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async activation(req, res, next) {
+    try {
+      const activation_token = req.body.activation_token;
+      const newUser = await jwt.verify(activation_token, process.env.ACTIVATION_SECRET, {
+        expiresIn: '1h',
+      });
+      if (!newUser) {
+        return next(new ErrorHandler('Invalid token', 400));
+      }
+      const user = await authService.register(newUser);
+
+      return res.apiResponse(user);
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
   },
   async login(req, res, next) {
-    const options = {
+    const cookieOptions = {
       expires: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
       httpOnly: true,
       sameSite: 'none',
@@ -30,7 +62,7 @@ const authController = {
         JwtHelpers.signAccessToken(payload),
         JwtHelpers.signRefreshToken(payload),
       ]);
-      res.cookie('accessToken', accessToken, options);
+      res.cookie('accessToken', accessToken, cookieOptions);
       return res.apiResponse({ user, accessToken, refreshToken });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
@@ -64,6 +96,13 @@ const authController = {
       }
       return next(new ErrorHandler(error.message, 500));
     }
+  },
+  async logout(req, res) {
+    res.clearCookie('accessToken');
+    return res.apiResponse({
+      ...responseStatus.SUCCESS,
+      message: 'Log out successfully',
+    });
   },
 };
 export default authController;

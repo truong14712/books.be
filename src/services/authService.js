@@ -3,8 +3,8 @@ import userModel from '~/models/userModel';
 import bcryptHelpers from '~/utils/bcryptHelpers';
 import bcrypt from 'bcrypt';
 const authService = {
-  async register(data, fileData) {
-    const { email, password, ...rest } = data;
+  async register(data) {
+    const { email, password, ...rest } = data.data;
     try {
       const findUser = await userModel.findOne({ email });
       if (findUser) throw createHttpError(409, 'Email already exists');
@@ -14,8 +14,8 @@ const authService = {
         password: hashedPassword,
         ...rest,
         avatar: {
-          public_id: fileData.filename,
-          url: fileData.path,
+          public_id: data.fileData.filename,
+          url: data.fileData.path,
         },
       });
       if (!newUser) throw createHttpError(500, 'Add user failed');
