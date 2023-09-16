@@ -1,14 +1,14 @@
 import { Schema, model } from 'mongoose';
-
+import paginate from 'mongoose-paginate-v2';
 const userSchema = new Schema(
   {
     firstName: {
       type: String,
-      required: [true, 'Please enter your name!'],
+      required: [true, 'Please enter your firstName!'],
     },
     lastName: {
       type: String,
-      required: [true, 'Please enter your name!'],
+      required: [true, 'Please enter your lastName!'],
     },
     email: {
       type: String,
@@ -61,4 +61,5 @@ const userSchema = new Schema(
   },
   { timestamps: true },
 );
+userSchema.plugin(paginate);
 export default model('user', userSchema);
