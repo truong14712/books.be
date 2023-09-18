@@ -1,5 +1,4 @@
 import createHttpError from 'http-errors';
-import slugify from 'slugify';
 import categoryModel from '~/models/categoryModel';
 
 const categoryService = {
@@ -35,20 +34,20 @@ const categoryService = {
   async getAll(query) {
     try {
       const { _limit = 10, _sort = 'name', _order = 'ascend', _page = 1, _q = '' } = query;
-      // const options = {
-      //   sort: { [_sort]: _order === 'descend' ? -1 : 1 },
-      //   limit: _limit,
-      //   populate: [{ path: 'books', select: ['nameBook'] }],
-      //   page: _page,
-      // };
+      const options = {
+        sort: { [_sort]: _order === 'descend' ? -1 : 1 },
+        limit: _limit,
+        populate: [{ path: 'books', select: ['nameBook'] }],
+        page: _page,
+      };
       const categories = await categoryModel.paginate(
         {
           nameCategory: new RegExp(_q, 'i'),
         },
-        // options,
+        options,
       );
       if (categories.docs.length === 0) {
-        return categories;
+        return [];
       }
       return categories;
     } catch (error) {
