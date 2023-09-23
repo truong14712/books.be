@@ -29,6 +29,30 @@ const AuthSchema = {
       .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
     password: Joi.string().min(6).required().max(20),
   }),
+  changeInformation: Joi.object({
+    firstName: Joi.string().pattern(/^\D+$/).required().messages({
+      'string.pattern.base': 'The name cannot enter numbers and special characters',
+    }),
+    lastName: Joi.string().pattern(/^\D+$/).required().messages({
+      'string.pattern.base': 'The name cannot enter numbers and special characters',
+    }),
+    phoneNumber: Joi.number().required(),
+  }),
+  changePassword: Joi.object({
+    password: Joi.string().min(6).required(),
+    newPassword: Joi.string().min(6).required(),
+    confirmPassword: Joi.string().required().valid(Joi.ref('newPassword')).messages({
+      'any.only': 'Confirm Password wrong!',
+    }),
+  }),
+  updateAddress: Joi.object({
+    country: Joi.string().required(),
+    city: Joi.string().required(),
+    address1: Joi.string().required(),
+    address2: Joi.string().required(),
+    zipCode: Joi.number().required(),
+    addressType: Joi.string().required(),
+  }),
 };
 
 export default AuthSchema;
