@@ -20,7 +20,7 @@ const userSchema = new Schema(
       required: [true, 'Please enter your password'],
     },
     phoneNumber: {
-      type: Number,
+      type: String,
     },
     addresses: [
       {
