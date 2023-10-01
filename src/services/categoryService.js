@@ -33,11 +33,11 @@ const categoryService = {
   },
   async getAll(query) {
     try {
-      const { _limit = 10, _sort = 'name', _order = 'ascend', _page = 1, _q = '' } = query;
+      const { _limit = 100, _sort = 'name', _order = 'ascend', _page = 1, _q = '' } = query;
       const options = {
         sort: { [_sort]: _order === 'descend' ? -1 : 1 },
         limit: _limit,
-        populate: [{ path: 'books', select: ['nameBook'] }],
+        populate: [{ path: 'books', select: ['_id', 'nameBook'] }],
         page: _page,
       };
       const categories = await categoryModel.paginate(
@@ -56,9 +56,20 @@ const categoryService = {
   },
   async getById(id) {
     try {
-      const category = await categoryModel.findById(id);
+      const category = await categoryModel.findById(id).populate('books');
       if (!category) throw createHttpError(404, 'Not found category');
       return category;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
+  async getBooksByCategory(id) {
+    try {
+      const category = await categoryModel.findById(id).populate('books');
+      if (!category) {
+        throw createHttpError(404, 'Category not found');
+      }
+      return category.books;
     } catch (error) {
       throw createHttpError(500, error);
     }

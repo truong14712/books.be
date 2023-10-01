@@ -51,5 +51,14 @@ const categoryController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async getBooksByCategory(req, res, next) {
+    try {
+      const { id } = req.params;
+      const books = await categoryService.getBooksByCategory(id);
+      return res.apiResponse(books);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
 };
 export default categoryController;
