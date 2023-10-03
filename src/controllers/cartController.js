@@ -38,6 +38,14 @@ const cartController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async clearCarts(req, res, next) {
+    try {
+      const cart = await cartService.clearCarts(req.body);
+      return res.apiResponse(cart);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
   async getAll(req, res, next) {
     try {
       const carts = await cartService.getAll();

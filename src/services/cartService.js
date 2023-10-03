@@ -83,7 +83,22 @@ const cartService = {
       throw createHttpError(500, error);
     }
   },
+  async clearCarts(data) {
+    try {
+      const result = await cartModel.updateMany(
+        { 'books.bookId': { $in: data } }, // Specify the condition to match the bookIds
+        { $pull: { books: { bookId: { $in: data } } } }, // Use $pull to remove the matched books from the array
+      );
+      // Kiểm tra số lượng giỏ hàng đã bị xóa
+      if (result.deletedCount === 0) {
+        throw createHttpError(404, 'Carts not found');
+      }
 
+      return result;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
   // Mua xong thì xóa giỏ hàng
   async delete(id) {
     try {

@@ -47,7 +47,7 @@ const CheckMiddleware = {
   async authorization(req, res, next) {
     try {
       const user = req.user;
-      if (!(user.role === 'admin')) {
+      if (user.role !== 'admin') {
         return next(new ErrorHandler(`Role: ${req.user.role} is not allowed to access this resources `, 403));
       }
       next();

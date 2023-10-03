@@ -11,5 +11,6 @@ router.post('/', CheckMiddleware.authentication, CartValidation.cart, cartContro
 router.post('/update', CheckMiddleware.authentication, CartValidation.cart, cartController.update);
 router.post('/updateCartItemQuantity', CheckMiddleware.authentication, cartController.updateCartItemQuantity);
 router.patch('/updateInCart', cartController.updateInCart);
+router.post('/clearCarts', CheckMiddleware.authentication, cartController.clearCarts);
 router.delete('/:id', CheckMiddleware.authentication, cartController.delete);
 export default router;
