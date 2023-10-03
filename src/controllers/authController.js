@@ -57,7 +57,7 @@ const authController = {
       const data = req.body;
       const user = await authService.login(data);
       const { email, role } = user;
-      const payload = { email: email, role: role };
+      const payload = { email: email, role: role, id: user._id };
       const [accessToken, refreshToken] = await Promise.all([
         JwtHelpers.signAccessToken(payload),
         JwtHelpers.signRefreshToken(payload),
@@ -103,6 +103,75 @@ const authController = {
       ...responseStatus.SUCCESS,
       message: 'Log out successfully',
     });
+  },
+  async changeInformation(req, res, next) {
+    try {
+      const data = req.body;
+      const id = req.user.id;
+      const user = await authService.changeInformation(id, data);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async changeAvatar(req, res, next) {
+    try {
+      const file = req.file;
+      const id = req.user.id;
+      const user = await authService.changeAvatar(id, file);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async getAll(req, res, next) {
+    try {
+      const query = req.query;
+      const user = await authService.getAll(query);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async getOne(req, res, next) {
+    try {
+      const id = req.params.id;
+      const user = await authService.getOne(id);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async changePassword(req, res, next) {
+    try {
+      const data = req.body;
+      const id = req.user.id;
+      const user = await authService.changePassword(id, data);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async updateAddress(req, res, next) {
+    try {
+      const data = req.body;
+      const id = req.user.id;
+      const user = await authService.updateAddress(id, data);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+
+  async deleteAddress(req, res, next) {
+    try {
+      const addressId = req.params.id;
+      const id = req.user.id;
+      const user = await authService.deleteAddress(id, addressId);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
   },
 };
 export default authController;
