@@ -17,14 +17,9 @@ const bookSchema = new Schema(
       type: String,
       required: [true, 'Please enter your auth!'],
     },
-    // originalPrice
     price: {
       type: Number,
       required: [true, 'Please enter your price!'],
-    },
-    discountPrice: {
-      type: Number,
-      required: [true, 'Please enter your discount price!'],
     },
     pageNumber: {
       type: Number,
@@ -55,8 +50,10 @@ const bookSchema = new Schema(
       required: [true, 'Please enter your Translator!'],
     },
     coverType: {
-      type: String,
-      required: [true, 'Please enter your CoverType!'],
+      type: Boolean,
+      // paperback:false
+      // Hardcover:true
+      default: false,
     },
     language: {
       type: String,
@@ -89,41 +86,8 @@ const bookSchema = new Schema(
     },
     stock: {
       type: Number,
-      required: [true, 'Please enter your book stock!'],
-    },
-    brand: {
-      type: String,
-    },
-    reviews: [
-      {
-        user: {
-          type: Object,
-        },
-        rating: {
-          type: Number,
-        },
-        comment: {
-          type: String,
-        },
-        bookId: {
-          type: String,
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now(),
-        },
-      },
-    ],
-    ratings: {
-      type: Number,
-    },
-    sold_out: {
-      type: Number,
-      default: 0,
-    },
-    isHighlighted: {
-      type: Boolean,
-      default: false,
+      required: true,
+      default: 1,
     },
   },
   { timestamps: true },
