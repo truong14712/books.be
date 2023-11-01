@@ -229,5 +229,27 @@ const authController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async loginSuccessGoogle(req, res, next) {
+    try {
+      const { id } = req.body;
+      const user = await authService.loginSuccessGoogle(id);
+      const payload = { email: user.email, role: user.role, id: user._id };
+      const accessToken = await JwtHelpers.signAccessToken(payload);
+      return res.apiResponse({ user, accessToken });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async loginSuccessFacebook(req, res, next) {
+    try {
+      const { id } = req.body;
+      const user = await authService.loginSuccessFacebook(id);
+      const payload = { email: user.email, role: user.role, id: user._id };
+      const accessToken = await JwtHelpers.signAccessToken(payload);
+      return res.apiResponse({ user, accessToken });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
 };
 export default authController;

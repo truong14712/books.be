@@ -250,5 +250,13 @@ const authService = {
       throw createHttpError(500, error);
     }
   },
+  async loginSuccessGoogle(id) {
+    const user = await userModel.findOne({ googleId: id });
+    return user;
+  },
+  async loginSuccessFacebook(id) {
+    const user = await userModel.findOne({ facebookId: id });
+    return user;
+  },
 };
 export default authService;
