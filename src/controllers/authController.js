@@ -1,11 +1,14 @@
-import authService from '~/services/authService';
+import authService from '~/services/auth.service';
 import ErrorHandler from '~/utils/ErrorHandler';
 import JwtHelpers from '~/utils/jwtToken';
 import jwt from 'jsonwebtoken';
 import responseStatus from '~/constants/responseStatus';
 import createActivationToken from '~/utils/createActivationToken';
 import sendMail from '~/utils/sendMail';
-
+import { generateResetToken } from '~/utils/generateResetToken';
+import userModel from '~/models/userModel';
+import dotenv from 'dotenv';
+dotenv.config();
 const authController = {
   async register(req, res, next) {
     try {
@@ -16,11 +19,11 @@ const authController = {
         data,
       };
       const activationToken = createActivationToken(user);
-      const activationUrl = `http://localhost:4200/activation/${activationToken}`;
+      const activationUrl = `${process.env.URL_CLIENT}/activation/${activationToken}`;
       await sendMail({
         email: user.data.email,
-        subject: 'Activate your account',
-        message: `Hello ${user.data.firstName}${user.data.lastName}, please click on the link to activate your account: ${activationUrl}`,
+        subject: 'Kích hoạt tài khoản của bạn',
+        message: `Chào ${user.data.firstName}${user.data.lastName}, Vui lòng kích vào đây để kích hoạt tài khoản đã đăng ký: ${activationUrl}`,
       });
       return res.status(201).json({
         success: true,
@@ -57,7 +60,7 @@ const authController = {
       const data = req.body;
       const user = await authService.login(data);
       const { email, role } = user;
-      const payload = { email: email, role: role };
+      const payload = { email: email, role: role, id: user._id };
       const [accessToken, refreshToken] = await Promise.all([
         JwtHelpers.signAccessToken(payload),
         JwtHelpers.signRefreshToken(payload),
@@ -103,6 +106,26 @@ const authController = {
       ...responseStatus.SUCCESS,
       message: 'Log out successfully',
     });
+  },
+  async changeInformation(req, res, next) {
+    try {
+      const data = req.body;
+      const id = req.user.id;
+      const user = await authService.changeInformation(id, data);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async changeAvatar(req, res, next) {
+    try {
+      const file = req.file;
+      const id = req.user.id;
+      const user = await authService.changeAvatar(id, file);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
   },
 };
 export default authController;
