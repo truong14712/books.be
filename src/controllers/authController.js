@@ -154,5 +154,45 @@ const authController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async changePassword(req, res, next) {
+    try {
+      const data = req.body;
+      const id = req.user.id;
+      const user = await authService.changePassword(id, data);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async addAddress(req, res, next) {
+    try {
+      const data = req.body;
+      const id = req.user.id;
+      const user = await authService.addAddress(id, data);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async changeAddressStatus(req, res, next) {
+    try {
+      const data = req.body;
+      const id = req.user.id;
+      const user = await authService.changeAddressStatus(id, data);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async deleteAddress(req, res, next) {
+    try {
+      const addressId = req.params.id;
+      const id = req.user.id;
+      const user = await authService.deleteAddress(id, addressId);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
 };
 export default authController;

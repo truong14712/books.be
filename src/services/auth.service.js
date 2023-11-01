@@ -128,5 +128,102 @@ const authService = {
       throw createHttpError(500, error);
     }
   },
+  async changePassword(id, data) {
+    try {
+      const { password, newPassword } = data;
+
+      const user = await userModel.findById(id);
+      const isCurrentPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (!isCurrentPasswordValid) throw createHttpError(401, 'Current password is incorrect');
+
+      const hashedPassword = await bcryptHelpers.hashPassword(newPassword);
+
+      const newUser = await userModel
+        .findByIdAndUpdate(id, { password: hashedPassword }, { new: true })
+        .select('-password');
+
+      if (!user) throw createHttpError(404, 'User not found');
+
+      return newUser;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
+  async addAddress(id, data) {
+    try {
+      const user = await userModel.findById(id);
+      const sameTypeAddress = user.addresses.find((address) => address.addressType === data.addressType);
+      if (sameTypeAddress) {
+        throw createHttpError(400, 'Address already exists');
+      }
+
+      const existsAddress = user.addresses.find((address) => address._id === data._id);
+
+      if (existsAddress) {
+        Object.assign(existsAddress, data);
+      } else {
+        // Thêm địa chỉ mới vào mảng addresses
+        const newAddress = { ...data };
+        if (!data.status) {
+          newAddress.status = !user.addresses.some((address) => address.status);
+        }
+        user.addresses.push(newAddress);
+      }
+
+      if (!user) throw createHttpError(404, 'User not found');
+      await user.save();
+
+      return user;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
+  async changeAddressStatus(userId, data) {
+    try {
+      const user = await userModel.findById(userId);
+      if (!user) {
+        throw createHttpError(404, 'User not found');
+      }
+
+      const addressIndex = user.addresses.findIndex((address) => String(address._id) === data.addressId);
+      if (addressIndex === -1) {
+        throw createHttpError(404, 'Address not found');
+      }
+
+      user.addresses[addressIndex].status = data.status;
+
+      // Set other addresses' status to false
+      for (let i = 0; i < user.addresses.length; i++) {
+        if (i !== addressIndex) {
+          user.addresses[i].status = false;
+        }
+      }
+
+      await user.save();
+
+      return user;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
+  async deleteAddress(id, data) {
+    try {
+      const userId = id;
+      const addressId = data;
+      await userModel.updateOne(
+        {
+          _id: userId,
+        },
+        { $pull: { addresses: { _id: addressId } } },
+      );
+
+      const user = await userModel.findById(userId);
+
+      return user;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
 };
 export default authService;
