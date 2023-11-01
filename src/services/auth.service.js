@@ -73,5 +73,60 @@ const authService = {
       throw createHttpError(500, error);
     }
   },
+  async getAll(query) {
+    try {
+      const { _limit = 10, _sort = 'email', _order = 'ascend', _page = 1, _q = '' } = query;
+
+      const options = {
+        sort: { [_sort]: _order === 'descend' ? -1 : 1 },
+        limit: _limit,
+        // populate: [{ path: 'categoryId', select: ['_id'] }],
+        page: _page,
+      };
+
+      const user = await userModel.paginate(
+        {
+          firstName: new RegExp(_q, 'i'),
+          lastName: new RegExp(_q, 'i'),
+          email: new RegExp(_q, 'i'),
+        },
+        options,
+      );
+
+      if (user.docs.length === 0) {
+        return [];
+      }
+
+      return user;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
+  async getOne(id) {
+    try {
+      const user = await userModel.findById(id).select('-password');
+
+      if (!user) throw createHttpError(404, 'User not found');
+
+      return user;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
+  async deleteUser(id) {
+    try {
+      const user = await userModel.findById(id);
+      if (!user) {
+        throw createHttpError(404, 'User not found');
+      }
+      if (user.role === 'admin') {
+        throw createHttpError(400, 'Can not delete admin');
+      }
+      const deleteUser = await userModel.findByIdAndDelete(id);
+      return deleteUser;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
 };
 export default authService;

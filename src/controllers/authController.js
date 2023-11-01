@@ -127,5 +127,32 @@ const authController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async getAll(req, res, next) {
+    try {
+      const query = req.query;
+      const user = await authService.getAll(query);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async getOne(req, res, next) {
+    try {
+      const id = req.params.id;
+      const user = await authService.getOne(id);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async deleteUser(req, res, next) {
+    try {
+      const id = req.params.id;
+      const user = await authService.deleteUser(id);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
 };
 export default authController;
