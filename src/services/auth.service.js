@@ -225,5 +225,30 @@ const authService = {
       throw createHttpError(500, error);
     }
   },
+  async resetPassword(token, data) {
+    try {
+      const { newPassword } = data;
+      const user = await userModel.findOne({
+        resetPasswordToken: token,
+        resetPasswordExpires: { $gt: Date.now() },
+      });
+
+      if (!user) {
+        throw createHttpError(400, 'Invalid or expired token');
+      }
+
+      const hashedPassword = await bcryptHelpers.hashPassword(newPassword);
+
+      // Đặt mật khẩu mới cho người dùng
+      user.password = hashedPassword;
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+
+      return user;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
 };
 export default authService;

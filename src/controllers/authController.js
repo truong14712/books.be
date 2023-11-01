@@ -194,5 +194,40 @@ const authController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async forgotPassword(req, res, next) {
+    try {
+      const { email } = req.body;
+      const user = await userModel.findOne({ email });
+      if (!user) {
+        return next(new ErrorHandler('User not found', 500));
+      }
+      const resetToken = generateResetToken(user);
+      user.resetPasswordToken = resetToken;
+      user.resetPasswordExpires = Date.now() + 3600000; // Thời hạn 1 giờ
+      await user.save();
+      const resetUrl = `${process.env.URL_CLIENT}/buyer/forgot-password/${resetToken}`;
+      await sendMail({
+        email: user.email,
+        subject: 'Đặt lại mật khẩu',
+        message: `Kich vào đây để đặt lại mật khẩu: ${resetUrl}`,
+      });
+      return res.status(201).json({
+        success: true,
+        message: `Vui lòng kiểm tra email: ${user.email} để đặt lại mật khẩu!`,
+      });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async resetPassword(req, res, next) {
+    try {
+      const data = req.body;
+      const token = req.params.id;
+      const user = await authService.resetPassword(token, data);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
 };
 export default authController;
