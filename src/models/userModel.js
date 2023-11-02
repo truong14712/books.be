@@ -17,7 +17,6 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      required: [true, 'Please enter your password'],
     },
     phoneNumber: {
       type: String,
@@ -27,13 +26,13 @@ const userSchema = new Schema(
         country: {
           type: String,
         },
+        state: {
+          type: String,
+        },
         city: {
           type: String,
         },
-        address1: {
-          type: String,
-        },
-        address2: {
+        address: {
           type: String,
         },
         zipCode: {
@@ -41,6 +40,11 @@ const userSchema = new Schema(
         },
         addressType: {
           type: String,
+        },
+        // Giá trị mặc định là true
+        status: {
+          type: Boolean,
+          default: false,
         },
       },
     ],
@@ -57,6 +61,31 @@ const userSchema = new Schema(
         type: String,
         default: 'https://res.cloudinary.com/diqyzhuc2/image/upload/v1683285518/hoaUi/icon_sacea8-removebg_gkhuzj.png',
       },
+    },
+    withdrawMethod: {
+      type: Object,
+    },
+    availableBalance: {
+      type: Number,
+      default: 0,
+    },
+    resetPasswordToken: {
+      type: String,
+    },
+    resetPasswordExpires: {
+      type: Date,
+    },
+    googleId: {
+      type: String,
+    },
+    facebookId: {
+      type: String,
+    },
+    typeLogin: {
+      type: String,
+      enum: ['local', 'facebook', 'google'],
+      required: true,
+      default: 'local',
     },
   },
   { timestamps: true },
