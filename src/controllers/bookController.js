@@ -1,5 +1,5 @@
 import ErrorHandler from '~/utils/ErrorHandler';
-import bookService from '~/services/bookService';
+import bookService from '~/services/book.service';
 const bookController = {
   async create(req, res, next) {
     try {
@@ -45,6 +45,24 @@ const bookController = {
       const { id } = req.params;
       const book = await bookService.getById(id);
       return res.apiResponse(book);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+
+  async getAllIsHighlighted(req, res, next) {
+    try {
+      const query = req.query;
+      const books = await bookService.getAllIsHighlighted(query);
+      return res.apiResponse(books);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async getAllPublishers(req, res, next) {
+    try {
+      const books = await bookService.getAllPublishers();
+      return res.apiResponse(books);
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
