@@ -119,5 +119,33 @@ const bookController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async searchCoverType(req, res, next) {
+    try {
+      const query = req.query;
+      const books = await bookService.searchCoverType(query);
+      return res.apiResponse(books);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async searchProductReviewsAllUsers(req, res, next) {
+    try {
+      const data = req.body;
+      const book = await bookService.searchProductReviewsAllUsers(data);
+      return res.apiResponse(book);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async createNewReview(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const data = req.body;
+      const book = await bookService.createNewReview(data, userId);
+      return res.apiResponse(book);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
 };
 export default bookController;

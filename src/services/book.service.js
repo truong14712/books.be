@@ -263,6 +263,81 @@ const bookService = {
       throw createHttpError(500, error);
     }
   },
+  async searchCoverType(query) {
+    try {
+      const { _q } = query;
+      const options = {
+        populate: [{ path: 'categoryId', select: ['nameCategory', '_id'] }],
+      };
+      const books = await bookModel.find({ coverType: { $regex: _q, $options: 'i' } }, null, options).sort();
+      return books;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
+  async searchProductReviewsAllUsers(data) {
+    try {
+      const { bookId, rating } = data;
+      const book = await bookModel.findById(bookId);
+      if (!book) {
+        return []; // Trả về mảng rỗng nếu sản phẩm không tồn tại
+      }
+
+      const fiveStarReviews = book.reviews.filter((review) => review.rating === rating);
+
+      return fiveStarReviews;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
+  async createNewReview(data, userId) {
+    try {
+      const { user, rating, comment, bookId, orderId } = data;
+      const book = await bookModel.findById(bookId);
+      if (!book) {
+        throw createHttpError(404, 'Not found book');
+      }
+
+      // Check if user has already reviewed this book
+      if (userId && hasUserReviewedBook(book.reviews, userId)) {
+        throw createHttpError(400, 'You have already reviewed this book');
+      }
+
+      if (!userId) {
+        throw createHttpError(401, 'You must be logged in to review this book');
+      }
+
+      const review = { user, rating, comment, bookId };
+      const isReviewed = book.reviews.find((rev) => rev.user._id === userId);
+      if (isReviewed) {
+        const userReview = book.reviews.find((rev) => rev.user._id === userId);
+        userReview.rating = rating;
+        userReview.comment = comment;
+        userReview.user = user;
+      } else {
+        book.reviews.push(review);
+      } // Calculate average rating
+      const avgRating = book.reviews.reduce((total, rev) => total + rev.rating, 0) / book.reviews.length;
+      book.ratings = avgRating;
+
+      await book.save({ validateBeforeSave: false });
+
+      await orderModel.findByIdAndUpdate(
+        orderId,
+        {
+          $set: {
+            'cart.$[elem].isReviewed': true,
+            'cart.$[elem].reviews': book.reviews,
+            'cart.$[elem].ratings': book.ratings,
+          },
+        },
+        { arrayFilters: [{ 'elem._id': bookId }], new: true },
+      );
+      return book;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
 };
 function hasUserReviewedBook(reviews, userId) {
   return reviews.some((rev) => rev.user._id === userId);
