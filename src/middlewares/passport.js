@@ -52,7 +52,6 @@ passport.use(
       enableProof: true,
     },
     async function (accessToken, refreshToken, profile, cb) {
-      console.log(profile);
       try {
         if (profile.id) {
           const user = await userModel.findOne({ facebookId: profile.id, email: profile.emails[0]?.value });

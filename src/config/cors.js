@@ -1,5 +1,5 @@
 export const options = {
-  origin: 'http://localhost:4200',
+  origin: '*',
   // credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],

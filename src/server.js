@@ -8,8 +8,10 @@ import route from './routes';
 import options from './config/cors';
 import errorHandler from './middlewares/errorHandler';
 import apiResponse from './middlewares/apiResponse';
+import logApiMiddleware from './middlewares/logApiMiddleware';
 dotenv.config();
 const app = express();
+
 const hostname = 'localhost' || process.env.APP_HOST;
 const port = 8000 || process.env.APP_PORT;
 
@@ -18,6 +20,7 @@ app.use(cors(options));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(apiResponse);
+app.use(logApiMiddleware);
 connectDb();
 
 route(app);
