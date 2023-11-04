@@ -171,6 +171,22 @@ const bookService = {
       throw createHttpError(500, error);
     }
   },
+  async getAllCoverType() {
+    try {
+      const books = await bookModel.distinct('coverType');
+      return books;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
+  async getAllAuth() {
+    try {
+      const books = await bookModel.distinct('auth');
+      return books;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
 };
 function hasUserReviewedBook(reviews, userId) {
   return reviews.some((rev) => rev.user._id === userId);

@@ -67,5 +67,21 @@ const bookController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async getAllCoverType(req, res, next) {
+    try {
+      const books = await bookService.getAllCoverType();
+      return res.apiResponse(books);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async getAllAuth(req, res, next) {
+    try {
+      const books = await bookService.getAllAuth();
+      return res.apiResponse(books);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
 };
 export default bookController;
