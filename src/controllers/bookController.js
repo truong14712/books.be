@@ -101,5 +101,23 @@ const bookController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async searchPublisherName(req, res, next) {
+    try {
+      const query = req.query;
+      const books = await bookService.searchPublisherName(query);
+      return res.apiResponse(books);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async searchAuthName(req, res, next) {
+    try {
+      const query = req.query;
+      const books = await bookService.searchAuthName(query);
+      return res.apiResponse(books);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
 };
 export default bookController;

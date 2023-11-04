@@ -239,6 +239,30 @@ const bookService = {
       throw createHttpError(500, error);
     }
   },
+  async searchPublisherName(query) {
+    try {
+      const { _q } = query;
+      const options = {
+        populate: [{ path: 'categoryId', select: ['nameCategory', '_id'] }],
+      };
+      const books = await bookModel.find({ publisher: { $regex: _q, $options: 'i' } }, null, options).sort();
+      return books;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
+  async searchAuthName(query) {
+    try {
+      const { _q } = query;
+      const options = {
+        populate: [{ path: 'categoryId', select: ['nameCategory', '_id'] }],
+      };
+      const books = await bookModel.find({ auth: { $regex: _q, $options: 'i' } }, null, options).sort();
+      return books;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
 };
 function hasUserReviewedBook(reviews, userId) {
   return reviews.some((rev) => rev.user._id === userId);
