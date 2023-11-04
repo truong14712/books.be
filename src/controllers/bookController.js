@@ -83,5 +83,23 @@ const bookController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async search(req, res, next) {
+    try {
+      const query = req.query;
+      const books = await bookService.search(query);
+      return res.apiResponse(books);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async searchPrice(req, res, next) {
+    try {
+      const query = req.query;
+      const books = await bookService.searchPrice(query);
+      return res.apiResponse(books);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
 };
 export default bookController;

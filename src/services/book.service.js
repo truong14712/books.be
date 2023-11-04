@@ -187,6 +187,58 @@ const bookService = {
       throw createHttpError(500, error);
     }
   },
+  async search(query) {
+    try {
+      const { _limit = 100, _sort = 'nameBook', _order = 'ascend', _page = 1, _q = '' } = query;
+      const options = {
+        sort: { [_sort]: _order === 'descend' ? -1 : 1 },
+        limit: _limit,
+        populate: [{ path: 'categoryId', select: ['_id', 'nameCategory'] }],
+        page: _page,
+      };
+      const book = await bookModel
+        .find(
+          {
+            $or: [
+              { nameBook: new RegExp(_q, 'i') },
+              { auth: new RegExp(_q, 'i') },
+              { 'categoryId.nameCategory': new RegExp(_q, 'i') },
+            ],
+          },
+          null,
+          options,
+        )
+        .sort();
+      if (!book) throw createHttpError(404, 'Not found book');
+      return book;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
+  async searchPrice(query) {
+    try {
+      const { minPrice, maxPrice } = query;
+      const options = {
+        populate: [{ path: 'categoryId', select: ['nameCategory', '_id'] }],
+      };
+      const books = await bookModel
+        .find(
+          {
+            $or: [
+              {
+                discountPrice: { $gte: minPrice, $lte: maxPrice },
+              },
+            ],
+          },
+          null,
+          options,
+        )
+        .sort();
+      return books;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
 };
 function hasUserReviewedBook(reviews, userId) {
   return reviews.some((rev) => rev.user._id === userId);
