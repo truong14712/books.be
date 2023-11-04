@@ -66,6 +66,7 @@ router.put(
 );
 router.patch('/resetPassword/:id', AuthValidation.resetPassword, AuthController.resetPassword);
 router.patch('/addAddress', CheckMiddleware.authentication, AuthController.addAddress, AuthValidation.addAddress);
+router.patch('/updateAddress', CheckMiddleware.authentication, AuthController.updateAddress);
 router.patch('/changeAddressStatus', CheckMiddleware.authentication, AuthController.changeAddressStatus);
 router.delete('/:id', CheckMiddleware.authentication, CheckMiddleware.authorization, AuthController.deleteUser);
 router.delete('/deleteAddress/:id', CheckMiddleware.authentication, AuthController.deleteAddress);

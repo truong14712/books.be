@@ -179,6 +179,41 @@ const authService = {
       throw createHttpError(500, error);
     }
   },
+  async updateAddress(userId, addressId, updatedAddressData) {
+    try {
+      const user = await userModel.findById(userId);
+
+      if (!user) {
+        throw createHttpError(404, 'User not found');
+      }
+
+      const addressToUpdate = user.addresses.find((address) => address._id == addressId);
+
+      if (!addressToUpdate) {
+        throw createHttpError(404, 'Address not found');
+      }
+
+      // Kiểm tra xem địa chỉ cần cập nhật có khớp với loại địa chỉ khác đã tồn tại không
+      if (updatedAddressData.addressType && updatedAddressData.addressType !== addressToUpdate.addressType) {
+        const sameTypeAddress = user.addresses.find(
+          (address) => address.addressType === updatedAddressData.addressType,
+        );
+
+        if (sameTypeAddress) {
+          throw createHttpError(400, 'Address with this type already exists');
+        }
+      }
+
+      // Cập nhật các trường thông tin của địa chỉ
+      Object.assign(addressToUpdate, updatedAddressData);
+
+      await user.save();
+
+      return user;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
   async changeAddressStatus(userId, data) {
     try {
       const user = await userModel.findById(userId);

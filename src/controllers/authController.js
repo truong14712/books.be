@@ -174,6 +174,16 @@ const authController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async updateAddress(req, res, next) {
+    try {
+      const { addressId, updatedAddressData } = req.body;
+      const userId = req.user.id;
+      const user = await authService.updateAddress(userId, addressId, updatedAddressData);
+      return res.apiResponse(user);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
   async changeAddressStatus(req, res, next) {
     try {
       const data = req.body;
