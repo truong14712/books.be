@@ -1,5 +1,5 @@
 import slugify from 'slugify';
-import categoryService from '~/services/categoryService';
+import categoryService from '~/services/category.service';
 import ErrorHandler from '~/utils/ErrorHandler';
 
 const categoryController = {
