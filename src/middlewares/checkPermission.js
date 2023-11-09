@@ -48,7 +48,12 @@ const CheckMiddleware = {
     try {
       const user = req.user;
       if (user.role !== 'admin') {
-        return next(new ErrorHandler(`Role: ${req.user.role} is not allowed to access this resources `, 403));
+        return next(
+          new ErrorHandler(
+            `Role: ${req.user.role} is not allowed to access this resources `,
+            responseStatus.FORBIDDEN.status,
+          ),
+        );
       }
       next();
     } catch (error) {
