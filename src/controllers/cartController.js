@@ -1,4 +1,4 @@
-import cartService from '~/services/cartService';
+import cartService from '~/services/cart.service';
 import ErrorHandler from '~/utils/ErrorHandler';
 
 const cartController = {
