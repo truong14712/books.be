@@ -1,13 +1,15 @@
 import AuthSchema from '~/schemas/authSchema.js';
 import validateRequest from '~/middlewares/validateRequest.js';
 
-const { register, login, changeInformation, changePassword, updateAddress } = AuthSchema;
+const { register, login, changeInformation, changePassword, addAddress, forgotPassword, resetPassword } = AuthSchema;
 
 const AuthValidation = {
   register: validateRequest(register),
   login: validateRequest(login),
   changeInformation: validateRequest(changeInformation),
   changePassword: validateRequest(changePassword),
-  updateAddress: validateRequest(updateAddress),
+  addAddress: validateRequest(addAddress),
+  resetPassword: validateRequest(resetPassword),
+  forgotPassword: validateRequest(forgotPassword),
 };
 export default AuthValidation;
