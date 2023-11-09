@@ -45,13 +45,22 @@ const AuthSchema = {
       'any.only': 'Confirm Password wrong!',
     }),
   }),
-  updateAddress: Joi.object({
+  addAddress: Joi.object({
     country: Joi.string().required(),
+    state: Joi.string().required(),
     city: Joi.string().required(),
-    address1: Joi.string().required(),
-    address2: Joi.string().required(),
+    address: Joi.string().required(),
     zipCode: Joi.number().required(),
     addressType: Joi.string().required(),
+    status: Joi.boolean().default(false),
+  }),
+  forgotPassword: Joi.object({
+    email: Joi.string()
+      .required()
+      .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
+  }),
+  resetPassword: Joi.object({
+    newPassword: Joi.string().min(6).required(),
   }),
 };
 
