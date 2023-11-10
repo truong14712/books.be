@@ -41,5 +41,24 @@ const orderController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async getById(req, res, next) {
+    try {
+      const { id } = req.params;
+      const order = await orderService.getById(id);
+      return res.apiResponse(order);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async searchOrderUser(req, res, next) {
+    try {
+      const userId = req.user.id;
+      const query = req.query;
+      const order = await orderService.searchOrderUser(userId, query);
+      return res.apiResponse(order);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
 };
 export default orderController;
