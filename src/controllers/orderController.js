@@ -78,5 +78,25 @@ const orderController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async refundOrder(req, res, next) {
+    try {
+      const data = req.body;
+      const id = req.params.id;
+      const order = await orderService.refundOrder(data, id);
+      return res.apiResponse(order);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async refundOrderSuccess(req, res, next) {
+    try {
+      const data = req.body;
+      const id = req.params.id;
+      const order = await orderService.refundOrderSuccess(data, id);
+      return res.apiResponse(order);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
 };
 export default orderController;

@@ -198,5 +198,40 @@ const orderService = {
       return createdCart;
     }
   },
+  async refundOrder(data, id) {
+    try {
+      const { status } = data;
+      const order = await orderModel.findById(id);
+      if (!order) throw createHttpError(404, 'Not found order');
+      order.status = status;
+      await order.save({ validateBeforeSave: false });
+      return order;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
+  async refundOrderSuccess(data, id) {
+    const { status } = data;
+    const order = await orderModel.findById(id);
+    if (!order) throw createHttpError(404, 'Not found order');
+    async function updateOrder(id, quantity) {
+      const book = await bookModel.findById(id);
+
+      book.stock += quantity;
+      book.sold_out -= quantity;
+
+      await book.save({ validateBeforeSave: false });
+    }
+
+    if (status === 'Trả hàng/Hoàn tiền') {
+      order.cart.forEach(async (o) => {
+        await updateOrder(o._id, o.quantity);
+      });
+    }
+    order.status = status;
+
+    await order.save();
+    return order;
+  },
 };
 export default orderService;
