@@ -63,5 +63,47 @@ const orderService = {
     await order.save();
     return order;
   },
+  async cancelOrder(data, id) {
+    const order = await orderModel.findById(id);
+    if (!order) {
+      throw createHttpError(404, 'Not found order');
+    }
+    order.deliveredAt = Date.now();
+    order.reason = data.reason;
+    order.status = 'Đã hủy';
+    await order.save();
+
+    return order;
+  },
+
+  async getAll(query) {
+    try {
+      const { _limit = 100, _sort = 'deliveredAt', _order = 'ascend', _page = 1, _q = '' } = query;
+      const options = {
+        sort: { [_sort]: _order === 'descend' ? -1 : 1 },
+        limit: _limit,
+        populate: [{ path: 'userId', select: ['firstName', 'lastName', 'email'] }],
+        page: _page,
+      };
+      const order = await orderModel.paginate(
+        {
+          $or: [
+            { status: new RegExp(_q, 'i') },
+            { 'cart.nameBook': new RegExp(_q, 'i') },
+            {
+              orderId: new RegExp(_q, 'i'),
+            },
+          ],
+        },
+        options,
+      );
+      if (order.docs.length === 0) {
+        return [];
+      }
+      return order;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
 };
 export default orderService;

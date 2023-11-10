@@ -22,5 +22,24 @@ const orderController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async cancelOrder(req, res, next) {
+    try {
+      const data = req.body;
+      const id = req.params.id;
+      const order = await orderService.cancelOrder(data, id);
+      return res.apiResponse(order);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async getAll(req, res, next) {
+    try {
+      const query = req.query;
+      const order = await orderService.getAll(query);
+      return res.apiResponse(order);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
 };
 export default orderController;
