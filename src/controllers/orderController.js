@@ -60,5 +60,23 @@ const orderController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async getAllOrderUser(req, res, next) {
+    try {
+      const { id } = req.params;
+      const order = await orderService.getAllOrderUser(id);
+      return res.apiResponse(order);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async restoreOrder(req, res, next) {
+    try {
+      const id = req.params.id;
+      const order = await orderService.restoreOrder(id);
+      return res.apiResponse(order);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
 };
 export default orderController;

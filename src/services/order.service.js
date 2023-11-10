@@ -145,5 +145,58 @@ const orderService = {
       throw createHttpError(500, error);
     }
   },
+  async getAllOrderUser(userId) {
+    try {
+      const order = await orderModel
+        .find({
+          userId,
+        })
+        .sort({ createdAt: -1 });
+      if (!order) throw createHttpError(404, 'Not found order');
+      return order;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
+  async restoreOrder(id) {
+    const order = await orderModel.findById(id).lean();
+    if (!order) throw createHttpError(404, 'Not found order');
+
+    const cartExists = await cartModel.findOne({ userId: order.userId });
+
+    if (cartExists) {
+      // Giỏ hàng đã tồn tại, cần cập nhật thông tin sách
+      const updatedBooks = order.cart.map((item) => ({
+        bookId: item._id,
+        quantity: item.quantity,
+      }));
+
+      for (const updatedBook of updatedBooks) {
+        const existingBook = cartExists.books.find((book) => String(book.bookId) === String(updatedBook.bookId));
+        if (existingBook) {
+          // Nếu sách đã tồn tại trong giỏ hàng, cập nhật số lượng
+          existingBook.quantity += updatedBook.quantity;
+        } else {
+          // Nếu sách chưa tồn tại, thêm sách mới vào giỏ hàng
+          cartExists.books.push(updatedBook);
+        }
+      }
+
+      await cartExists.save();
+      return cartExists;
+    } else {
+      // Nếu giỏ hàng chưa tồn tại, tạo giỏ hàng mới
+      const newCart = {
+        userId: order.userId,
+        books: order.cart.map((item) => ({
+          bookId: item._id,
+          quantity: item.quantity,
+        })),
+      };
+
+      const createdCart = await cartModel.create(newCart);
+      return createdCart;
+    }
+  },
 };
 export default orderService;
