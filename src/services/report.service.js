@@ -63,5 +63,24 @@ const reportService = {
       throw createHttpError(500, error);
     }
   },
+  async deleteReview(id) {
+    try {
+      const report = await reportModel.findById(id);
+      if (!report) throw createHttpError(404, 'Not found report');
+
+      const book = await bookModel.findById(report.bookId);
+
+      book.reviews = book.reviews.filter((review) => review.user._id.toString() !== report.userId.toString());
+
+      const totalRatings = book.reviews.reduce((sum, review) => sum + review.rating, 0);
+      const averageRating = totalRatings / book.reviews.length;
+      book.ratings = averageRating;
+
+      await book.save();
+      return book;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
 };
 export default reportService;

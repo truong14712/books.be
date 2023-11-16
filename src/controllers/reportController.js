@@ -38,5 +38,14 @@ const reportController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async deleteReview(req, res, next) {
+    try {
+      const id = req.params.id;
+      const report = await reportService.deleteReview(id);
+      return res.apiResponse(report);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
 };
 export default reportController;
