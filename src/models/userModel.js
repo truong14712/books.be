@@ -62,9 +62,6 @@ const userSchema = new Schema(
         default: 'https://res.cloudinary.com/diqyzhuc2/image/upload/v1683285518/hoaUi/icon_sacea8-removebg_gkhuzj.png',
       },
     },
-    withdrawMethod: {
-      type: Object,
-    },
     availableBalance: {
       type: Number,
       default: 0,
