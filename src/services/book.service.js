@@ -41,15 +41,18 @@ const bookService = {
   async update(id, data, files) {
     try {
       const book = await bookModel.findById(id);
-      const imageUrls = await Promise.all(
-        files.map(async (value) => {
-          return {
-            url: value.path,
-            publicId: value.filename,
-          };
-        }),
-      );
-      data.images = imageUrls;
+      // Kiểm tra xem có files ảnh mới được cung cấp không
+      if (files && files.length > 0) {
+        const imageUrls = await Promise.all(
+          files.map(async (value) => {
+            return {
+              url: value.path,
+              publicId: value.filename,
+            };
+          }),
+        );
+        data.images = imageUrls;
+      }
       data.slug = slugify(data.nameBook);
       const newBook = await bookModel.findByIdAndUpdate(id, data, { new: true });
       const category = await categoryModel.findByIdAndUpdate(
@@ -73,10 +76,12 @@ const bookService = {
   async delete(id) {
     try {
       const book = await bookModel.findById(id);
-      const ImagesOld = book.images.map((value) => {
-        return value.publicId;
-      });
-      await cloudinary.api.delete_resources(ImagesOld);
+      if (book.images.length > 0) {
+        const ImagesOld = book.images.map((value) => {
+          return value.publicId;
+        });
+        await cloudinary.api.delete_resources(ImagesOld);
+      }
       await categoryModel.findByIdAndUpdate(
         book.categoryId,
         {
