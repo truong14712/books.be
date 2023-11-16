@@ -6,7 +6,7 @@ const responseStatus = {
   SUCCESS: {
     isSuccess: true,
     status: 200,
-    message: 'Success !',
+    message: 'Thành công !',
   },
   // Sử dụng khi tạo một tài nguyên
   CREATED: {
