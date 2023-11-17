@@ -18,5 +18,21 @@ const statisticalController = {
       return next(new ErrorHandler(error.message, 500));
     }
   },
+  async totalOrder(req, res, next) {
+    try {
+      const result = await statisticalService.totalOrder();
+      return res.apiResponse(result);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  async countRatingInOrders(req, res, next) {
+    try {
+      const result = await statisticalService.countRatingInOrders();
+      return res.apiResponse(result);
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
 };
 export default statisticalController;

@@ -77,5 +77,37 @@ const statisticalService = {
       throw createHttpError(500, error);
     }
   },
+  async totalOrder() {
+    try {
+      const result = await orderModel.aggregate([
+        {
+          $group: {
+            _id: '$status', // Nhóm theo trạng thái đơn hàng
+            count: { $sum: 1 }, // Đếm số lượng đơn hàng cho mỗi trạng thái
+          },
+        },
+      ]);
+      return result;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
+  async countRatingInOrders() {
+    try {
+      const result = await orderModel.aggregate([
+        { $unwind: '$cart' },
+        { $unwind: '$cart.reviews' },
+        {
+          $group: {
+            _id: '$cart.reviews.rating', // Nhóm các đánh giá theo số sao
+            count: { $sum: 1 }, // Đếm số lượng đánh giá cho mỗi số sao
+          },
+        },
+      ]);
+      return result;
+    } catch (error) {
+      throw createHttpError(500, error);
+    }
+  },
 };
 export default statisticalService;
