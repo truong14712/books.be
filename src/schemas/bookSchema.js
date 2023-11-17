@@ -25,6 +25,7 @@ const BookSchema = {
     sold_out: Joi.number(),
     discountPrice: Joi.number().required(),
     description: Joi.string(),
+    isHighlighted: Joi.boolean().default(false),
   }),
 };
 export default BookSchema;
